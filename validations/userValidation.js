@@ -32,7 +32,7 @@ const userSchema = Joi.object({
     }),
   
   isActive: Joi.boolean()
-    .default(false),
+    .default(true),
 });
 
 const updateUserSchema = userSchema.fork(

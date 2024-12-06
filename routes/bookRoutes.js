@@ -12,7 +12,7 @@ const { bookSchema, updateBookSchema } = require('../validations/bookValidation'
 
 const router = express.Router();
 
-router.get('/', auth, getAllBooks);
+router.get('/', [auth, checkRole(['admin', 'librarian'])], getAllBooks);
 router.post('/', [auth, checkRole(['admin']), validate(bookSchema)], addBook);
 router.put('/:id', [auth, checkRole(['admin']), validate(updateBookSchema)], updateBook);
 router.delete('/:id', [auth, checkRole(['admin'])], deleteBook);

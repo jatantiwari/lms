@@ -1,30 +1,55 @@
-module.exports = (sequelize, DataTypes) => {
-  const BorrowedBook = sequelize.define('BorrowedBook', {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
-    borrowDate: {
-      type: DataTypes.DATE
-    },
-    returnDate: {
-      type: DataTypes.DATE
-    },
-    status: {
-      type: DataTypes.ENUM('borrowed', 'returned'),
-      defaultValue: 'borrowed'
-    }
-  });
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
+const User = require('./User');
+const Book = require('./Book');
 
-  BorrowedBook.associate = (models) => {
-    BorrowedBook.belongsTo(models.User, {
-      foreignKey: 'userId'  // This will create only one userId column
-    });
-    BorrowedBook.belongsTo(models.Book, {
-      foreignKey: 'bookId'  // This will create only one bookId column
-    });
-  };
+const BorrowedBook = sequelize.define('BorrowedBook', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  userId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: User,
+      key: 'id',
+    },
+    allowNull: false,
+  },
+  bookId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Book,
+      key: 'id',
+    },
+    allowNull: false,
+  },
+  librarianId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: User,
+      key: 'id',
+    },
+    allowNull: false,
+  },
+  borrowDate: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  returnDate: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  status: {
+    type: DataTypes.ENUM('borrowed', 'returned'),
+    defaultValue: 'borrowed',
+  }
+});
 
-  return BorrowedBook;
-}; 
+// Define relationships
+BorrowedBook.belongsTo(User, { as: 'user', foreignKey: 'userId' });
+BorrowedBook.belongsTo(User, { as: 'librarian', foreignKey: 'librarianId' });
+BorrowedBook.belongsTo(Book, { foreignKey: 'bookId' });
+
+module.exports = BorrowedBook; 
